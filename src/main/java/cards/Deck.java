@@ -11,48 +11,106 @@ import static java.util.stream.IntStream.range;
  * functionality for shuffling, dealing, etc.
  */
 public class Deck {
-  /**
-   * Note: cards stored as two-character strings: rank (2, 3, 4, 5, 6, 7, 8, 9, T, J, Q, K, A) followed by
-   * suit (c, d, h, s).
-   * Jokers have integer ranks (1, 2, ...) and their suit is represented by a lowercase j.
-   */
-  private static final List<String> STANDARD_DECK = Arrays.asList(
-      "2c", "3c", "4c", "5c", "6c", "7c", "8c", "9c", "Tc", "Jc", "Qc", "Kc", "Ac",
-      "2d", "3d", "4d", "5d", "6d", "7d", "8d", "9d", "Td", "Jd", "Qd", "Kd", "Ad",
-      "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Th", "Jh", "Qh", "Kh", "Ah",
-      "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s", "Ts", "Js", "Qs", "Ks", "As");
-  private List<String> cardStack;
+  private static final List<Card> STANDARD_DECK = Arrays.asList(
+      new Card(1, Card.Suit.CLUBS),
+      new Card(2, Card.Suit.CLUBS),
+      new Card(3, Card.Suit.CLUBS),
+      new Card(4, Card.Suit.CLUBS),
+      new Card(5, Card.Suit.CLUBS),
+      new Card(6, Card.Suit.CLUBS),
+      new Card(7, Card.Suit.CLUBS),
+      new Card(8, Card.Suit.CLUBS),
+      new Card(9, Card.Suit.CLUBS),
+      new Card(10, Card.Suit.CLUBS),
+      new Card(11, Card.Suit.CLUBS),
+      new Card(12, Card.Suit.CLUBS),
+      new Card(13, Card.Suit.CLUBS),
+      new Card(1, Card.Suit.DIAMONDS),
+      new Card(2, Card.Suit.DIAMONDS),
+      new Card(3, Card.Suit.DIAMONDS),
+      new Card(4, Card.Suit.DIAMONDS),
+      new Card(5, Card.Suit.DIAMONDS),
+      new Card(6, Card.Suit.DIAMONDS),
+      new Card(7, Card.Suit.DIAMONDS),
+      new Card(8, Card.Suit.DIAMONDS),
+      new Card(9, Card.Suit.DIAMONDS),
+      new Card(10, Card.Suit.DIAMONDS),
+      new Card(11, Card.Suit.DIAMONDS),
+      new Card(12, Card.Suit.DIAMONDS),
+      new Card(13, Card.Suit.DIAMONDS),
+      new Card(1, Card.Suit.HEARTS),
+      new Card(2, Card.Suit.HEARTS),
+      new Card(3, Card.Suit.HEARTS),
+      new Card(4, Card.Suit.HEARTS),
+      new Card(5, Card.Suit.HEARTS),
+      new Card(6, Card.Suit.HEARTS),
+      new Card(7, Card.Suit.HEARTS),
+      new Card(8, Card.Suit.HEARTS),
+      new Card(9, Card.Suit.HEARTS),
+      new Card(10, Card.Suit.HEARTS),
+      new Card(11, Card.Suit.HEARTS),
+      new Card(12, Card.Suit.HEARTS),
+      new Card(13, Card.Suit.HEARTS),
+      new Card(1, Card.Suit.SPADES),
+      new Card(2, Card.Suit.SPADES),
+      new Card(3, Card.Suit.SPADES),
+      new Card(4, Card.Suit.SPADES),
+      new Card(5, Card.Suit.SPADES),
+      new Card(6, Card.Suit.SPADES),
+      new Card(7, Card.Suit.SPADES),
+      new Card(8, Card.Suit.SPADES),
+      new Card(9, Card.Suit.SPADES),
+      new Card(10, Card.Suit.SPADES),
+      new Card(11, Card.Suit.SPADES),
+      new Card(12, Card.Suit.SPADES),
+      new Card(13, Card.Suit.SPADES));
 
-  private Deck(List<String> cardStack) {
+  private List<Card> cardStack;
+
+  private Deck(List<Card> cardStack) {
     this.cardStack = cardStack;
   }
 
+  /**
+   * Creates a new Deck with the specified number of standard 52-card decks and jokers.
+   */
   public Deck(int numDecks, int numJokers) {
-    Stream<String> standardCards = (range(0, numDecks).mapToObj(String::valueOf)).flatMap(dummy -> STANDARD_DECK.stream());
-    Stream<String> jokers = (range(0, numJokers).mapToObj(String::valueOf)).map(numStr -> numStr + "j");
+    Stream<Card> standardCards = (range(0, numDecks).mapToObj(String::valueOf)).flatMap(dummy -> STANDARD_DECK.stream());
+    Stream<Card> jokers = (range(0, numJokers).mapToObj(String::valueOf))
+        .map(numStr -> new Card(Integer.parseInt(numStr), Card.Suit.JOKER));
     cardStack = Stream.concat(standardCards, jokers).collect(Collectors.toList());
   }
 
   /**
    * Returns the next card to be dealt from the stack (but doesn't actually deal that card).
    */
-  public String peek() {
+  public Optional<Card> peek() {
     if (cardStack.isEmpty()) {
-      return "No cards left";
+      return Optional.empty();
     } else {
-      return cardStack.get(0);
+      return Optional.of(cardStack.get(0));
     }
+  }
+
+  public String peekString() {
+    Optional<Card> ocard = peek();
+    return ocard.map(Card::toString).orElse("No cards left");
   }
 
   /**
    * Deals the next card from the stack (removes that card from the stack).
    */
-  public String deal() {
+  public Optional<Card> deal() {
     if (cardStack.isEmpty()) {
-      return "No cards left";
+      return Optional.empty();
     } else {
-      return cardStack.remove(0);
+      return Optional.of(cardStack.remove(0));
     }
+  }
+
+  public String dealString() {
+    Optional<Card> ocard = deal();
+    return ocard.map(Card::toString).orElse("No cards left");
   }
 
   /**
@@ -67,12 +125,16 @@ public class Deck {
    */
   public Deck shuffle() {
     Random random = new Random();
+    // map each index of the card stack to a random number and sort by that random number
     List<AbstractMap.SimpleEntry<String, Double>> ordering = range(0, cardStack.size()).mapToObj(String::valueOf)
         .map(indexStr -> new AbstractMap.SimpleEntry<>(indexStr, random.nextDouble())).collect(Collectors.toList());
     ordering.sort(new PairedComparator());
-    List<String> shuffledStack = ordering.stream().reduce(new LinkedList<>(),
+
+    // TODO consider using TreeMap instead? performance concerns on normal-sized inputs?
+
+    List<Card> shuffledStack = ordering.stream().reduce(new LinkedList<>(),
         (list, pair) -> {
-          list.add(pair.getKey());
+          list.add(cardStack.get(Integer.parseInt(pair.getKey())));
           return list;
         }, (list1, list2) -> {
           list1.addAll(list2);
