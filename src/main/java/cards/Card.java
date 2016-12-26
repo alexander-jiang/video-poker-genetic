@@ -4,7 +4,7 @@ package cards;
  * French-suited playing card (could be a joker).
  */
 public class Card {
-  enum Suit {
+  public enum Suit {
     CLUBS, DIAMONDS, HEARTS, SPADES, JOKER
   }
 
@@ -16,12 +16,16 @@ public class Card {
     this.suit = suit;
   }
 
-  int getRank() {
+  public int getRank() {
     return rank;
   }
 
-  Suit getSuit() {
+  public Suit getSuit() {
     return suit;
+  }
+
+  public boolean isJoker() {
+    return suit == Suit.JOKER;
   }
 
   /**

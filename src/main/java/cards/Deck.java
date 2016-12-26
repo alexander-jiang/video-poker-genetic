@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import static java.util.stream.IntStream.range;
 
 /**
- * French-suited playing card deck(s) with optional joker(s). Wrapper around a List of cards, with additional
+ * French-suited playing card deck(s) with optional joker(s). Essentially a wrapper around a List of cards, with additional
  * functionality for shuffling, dealing, etc.
  */
 public class Deck {
