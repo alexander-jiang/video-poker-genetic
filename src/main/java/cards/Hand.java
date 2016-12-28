@@ -1,22 +1,26 @@
 package cards;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 /**
  * A collection of French-suited playing cards (could contain duplicates). Essentially a wrapper around
- * a LinkedList of cards with some methods to check for existence of any card with a specific rank or suit.
+ * an ArrayList of cards with some methods to check for existence of any card with a specific rank or suit.
  */
-public class Hand extends LinkedList<Card> {
-  // use the of() constructor method instead
-  private Hand(Collection<Card> cards) {
+public class Hand extends ArrayList<Card> {
+  /**
+   * Creates a new Hand with the specified cards.
+   */
+  public Hand(Collection<? extends Card> cards) {
     super(cards);
   }
 
-  // use the makeEmpty() constructor method instead
-  private Hand() {
+  /**
+   * Creates an empty Hand.
+   */
+  public Hand() {
     super();
   }
 

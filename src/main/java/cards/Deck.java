@@ -7,11 +7,11 @@ import java.util.stream.Stream;
 import static java.util.stream.IntStream.range;
 
 /**
- * French-suited playing card deck(s) with optional joker(s). Essentially a wrapper around a List of cards, with additional
- * functionality for shuffling, dealing, etc.
+ * French-suited playing card deck(s) with optional joker(s). Essentially a wrapper around a LinkedList of cards
+ * (useful for removing from the head of the list), with additional functionality for shuffling, dealing, etc.
  */
-public class Deck {
-  private static final List<Card> STANDARD_DECK = Arrays.asList(
+public class Deck extends LinkedList<Card> {
+  private static final List<Card> STANDARD_DECK = new LinkedList<>(Arrays.asList(
       new Card(1, Card.Suit.CLUBS),
       new Card(2, Card.Suit.CLUBS),
       new Card(3, Card.Suit.CLUBS),
@@ -63,61 +63,31 @@ public class Deck {
       new Card(10, Card.Suit.SPADES),
       new Card(11, Card.Suit.SPADES),
       new Card(12, Card.Suit.SPADES),
-      new Card(13, Card.Suit.SPADES));
+      new Card(13, Card.Suit.SPADES)));
 
-  private List<Card> cardStack;
+  /**
+   * Creates an empty Deck.
+   */
+  public Deck() {
+    super();
+  }
 
-  private Deck(List<Card> cardStack) {
-    this.cardStack = cardStack;
+  /**
+   * Creates a Deck with the specified cards.
+   */
+  public Deck(Collection<? extends Card> cardStack) {
+    super(cardStack);
   }
 
   /**
    * Creates a new Deck with the specified number of standard 52-card decks and jokers.
    */
   public Deck(int numDecks, int numJokers) {
+    super();
     Stream<Card> standardCards = (range(0, numDecks).mapToObj(String::valueOf)).flatMap(dummy -> STANDARD_DECK.stream());
     Stream<Card> jokers = (range(0, numJokers).mapToObj(String::valueOf))
         .map(numStr -> new Card(Integer.parseInt(numStr), Card.Suit.JOKER));
-    cardStack = Stream.concat(standardCards, jokers).collect(Collectors.toList());
-  }
-
-  /**
-   * Returns the next card to be dealt from the stack (but doesn't actually deal that card).
-   */
-  public Optional<Card> peek() {
-    if (cardStack.isEmpty()) {
-      return Optional.empty();
-    } else {
-      return Optional.of(cardStack.get(0));
-    }
-  }
-
-  public String peekString() {
-    Optional<Card> ocard = peek();
-    return ocard.map(Card::toString).orElse("No cards left");
-  }
-
-  /**
-   * Deals the next card from the stack (removes that card from the stack).
-   */
-  public Optional<Card> deal() {
-    if (cardStack.isEmpty()) {
-      return Optional.empty();
-    } else {
-      return Optional.of(cardStack.remove(0));
-    }
-  }
-
-  public String dealString() {
-    Optional<Card> ocard = deal();
-    return ocard.map(Card::toString).orElse("No cards left");
-  }
-
-  /**
-   * Returns how many cards are left.
-   */
-  public int numCards() {
-    return cardStack.size();
+    this.addAll(Stream.concat(standardCards, jokers).collect(Collectors.toList()));
   }
 
   /**
@@ -126,7 +96,7 @@ public class Deck {
   public Deck shuffle() {
     Random random = new Random();
     // map each index of the card stack to a random number and sort by that random number
-    List<AbstractMap.SimpleEntry<String, Double>> ordering = range(0, cardStack.size()).mapToObj(String::valueOf)
+    List<AbstractMap.SimpleEntry<String, Double>> ordering = range(0, this.size()).mapToObj(String::valueOf)
         .map(indexStr -> new AbstractMap.SimpleEntry<>(indexStr, random.nextDouble())).collect(Collectors.toList());
     ordering.sort(new PairedComparator());
 
@@ -134,7 +104,7 @@ public class Deck {
 
     List<Card> shuffledStack = ordering.stream().reduce(new LinkedList<>(),
         (list, pair) -> {
-          list.add(cardStack.get(Integer.parseInt(pair.getKey())));
+          list.add(this.get(Integer.parseInt(pair.getKey())));
           return list;
         }, (list1, list2) -> {
           list1.addAll(list2);

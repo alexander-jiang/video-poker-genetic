@@ -7,60 +7,62 @@ import static org.junit.Assert.*;
 /**
  * Unit tests for the Deck class.
  */
+// suppress these warning for testing decks
+@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class DeckTest {
   @Test
   public void testConstructors() throws Exception {
     Deck emptyDeck = new Deck(0, 0);
-    assertEquals(0, emptyDeck.numCards());
+    assertEquals(0, emptyDeck.size());
 
     Deck standardDeck = new Deck(1, 0);
-    assertEquals(52, standardDeck.numCards());
+    assertEquals(52, standardDeck.size());
 
     Deck deckWithJokers = new Deck(1, 2);
-    assertEquals(54, deckWithJokers.numCards());
+    assertEquals(54, deckWithJokers.size());
   }
 
   @Test
   public void testPeek() throws Exception {
     Deck emptyDeck = new Deck(0, 0);
-    assertFalse(emptyDeck.peek().isPresent());
+    assertTrue(emptyDeck.isEmpty());
 
     Deck standardDeck = new Deck(1, 0);
-    assertEquals("Ac", standardDeck.peekString());
-    assertEquals("Ac", standardDeck.peekString());
+    assertEquals("Ac", standardDeck.peek().toString());
+    assertEquals("Ac", standardDeck.peek().toString());
 
     Deck deckWithJokers = new Deck(1, 2);
-    assertEquals("Ac", deckWithJokers.peekString());
-    assertEquals("Ac", deckWithJokers.peekString());
+    assertEquals("Ac", deckWithJokers.peek().toString());
+    assertEquals("Ac", deckWithJokers.peek().toString());
   }
 
   @Test
   public void testDeal() throws Exception {
     Deck emptyDeck = new Deck(0, 0);
-    assertFalse(emptyDeck.deal().isPresent());
+    assertTrue(emptyDeck.isEmpty());
 
     Deck standardDeck = new Deck(1, 0);
-    assertEquals("Ac", standardDeck.dealString());
-    assertEquals("2c", standardDeck.dealString());
-    assertEquals(50, standardDeck.numCards());
+    assertEquals("Ac", standardDeck.remove().toString());
+    assertEquals("2c", standardDeck.remove().toString());
+    assertEquals(50, standardDeck.size());
 
     Deck deckWithJokers = new Deck(1, 2);
-    assertEquals("Ac", deckWithJokers.dealString());
-    assertEquals("2c", deckWithJokers.dealString());
-    assertEquals(52, deckWithJokers.numCards());
+    assertEquals("Ac", deckWithJokers.remove().toString());
+    assertEquals("2c", deckWithJokers.remove().toString());
+    assertEquals(52, deckWithJokers.size());
   }
 
   @Test
   public void testShuffle() throws Exception {
     Deck emptyDeck = new Deck(0, 0);
-    assertEquals(0, emptyDeck.shuffle().numCards());
+    assertEquals(0, emptyDeck.shuffle().size());
 
     Deck standardDeck = new Deck(1, 0);
-    assertEquals(52, standardDeck.numCards());
+    assertEquals(52, standardDeck.size());
     Deck shuffledDeck = standardDeck.shuffle();
-    assertEquals(52, shuffledDeck.numCards());
-    assertTrue(shuffledDeck.peek().equals(shuffledDeck.deal()));
-    assertEquals(shuffledDeck.peek(), shuffledDeck.deal());
+    assertEquals(52, shuffledDeck.size());
+    assertTrue(shuffledDeck.peek().equals(shuffledDeck.remove()));
+    assertEquals(shuffledDeck.peek(), shuffledDeck.remove());
   }
 
 }
